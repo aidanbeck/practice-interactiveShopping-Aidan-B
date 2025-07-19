@@ -1,22 +1,68 @@
-const input = document.getElementById("nameInput");
-const button = document.getElementById("addItemButton");
-const list = document.getElementById("itemList");
+const nameInput = document.getElementById("nameInput");
+const addItemButton = document.getElementById("addItemButton");
+const itemList = document.getElementById("itemList");
 
-button.addEventListener("click", () => {
-    
+function removeItem(id) {
+    document.getElementById(id).remove();
+}
+
+function editItem(id) {
+    let listEntry = document.getElementById(id);
+    listEntry.innerHTML = '';
+
+    // Create Input
+    let renameInput = document.createElement("input");
+    renameInput.value = id;
+    renameInput.id = `${id}Save`;
+    listEntry.appendChild(renameInput);
+
+    // Create Save Button
+    let saveButton = document.createElement("button");
+    saveButton.innerHTML = '💾';
+    saveButton.addEventListener("click", () => saveItem(id));
+    listEntry.appendChild(saveButton);
+}
+
+function saveItem(id) {
+    let element = document.getElementById(id);
+
+    let newName = document.getElementById(`${id}Save`).value;
+    let newElement = createItem(newName);
+
+    element.replaceWith(newElement);
+}
+
+function createItem(name) {
+
+    // Create Label
+    let label = document.createElement("span");
+    label.innerHTML = name + " ";
+
     // Create Remove Button
-    let removeItem = document.createElement("button");
-    removeItem.innerHTML = '-';
-    removeItem.addEventListener("click", function() { // Must not be an arrow function, or the 'this' keyword will not find the button. I am not sure why
-        this.parentNode.remove();
-    });
+    let removeButton = document.createElement("button");
+    removeButton.innerHTML = '-';
+    removeButton.addEventListener("click", () => removeItem(name));
+
+    // Create Edit Button
+    let editButton = document.createElement("button");
+    editButton.innerHTML = '✎';
+    editButton.addEventListener("click", () => editItem(name));
 
     // Create List Element
     let li = document.createElement("li");
-    li.innerHTML = input.value + " ";
-    li.id = input.value;
-    li.appendChild(removeItem);
-    list.appendChild(li);
+    li.id = name;
+    li.appendChild(label);
+    li.appendChild(editButton);
+    li.appendChild(removeButton);
 
-    input.value = '';
+    return li;
+}
+
+addItemButton.addEventListener("click", () => {
+
+    if (nameInput.value == '' || nameInput.value == undefined) { return; }
+
+    let newItem = createItem(nameInput.value);
+    itemList.appendChild(newItem);
+    nameInput.value = '';
 });
